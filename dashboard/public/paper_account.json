@@ -1,0 +1,329 @@
+{
+  "balance": 9.957142878182847,
+  "positions": [
+    {
+      "symbol": "XAGUSDT",
+      "side": "Buy",
+      "size": 4.198740377886634,
+      "margin": 10.0,
+      "leverage": 30,
+      "fee": 0.3,
+      "entry": 71.45,
+      "pnl": 0.0,
+      "stop_price": 71.4224,
+      "original_stop": 70.021,
+      "take_profit": 78.59500000000001,
+      "tp_stages": [
+        {
+          "price": 75.02250000000001,
+          "qty": 2.09937019,
+          "hit": false
+        },
+        {
+          "price": 76.80875,
+          "qty": 1.04968509,
+          "hit": false
+        },
+        {
+          "price": 78.59500000000001,
+          "qty": 1.0496851,
+          "hit": false
+        }
+      ],
+      "high_water": 72.88,
+      "low_water": null,
+      "timestamp": "2026-03-19T14:27:10.870134",
+      "entry_time": "2026-03-19T14:27:10.870174",
+      "entry_score": 139,
+      "mark_price": 72.74
+    },
+    {
+      "symbol": "PAXGUSDT",
+      "side": "Buy",
+      "size": 0.043308791684711995,
+      "margin": 10.0,
+      "leverage": 20,
+      "fee": 0.2,
+      "entry": 4618.0,
+      "pnl": 0.0,
+      "stop_price": 4582.48,
+      "original_stop": 4525.64,
+      "take_profit": 5079.8,
+      "tp_stages": [
+        {
+          "price": 4848.900000000001,
+          "qty": 0.0216544,
+          "hit": false
+        },
+        {
+          "price": 4964.349999999999,
+          "qty": 0.0108272,
+          "hit": false
+        },
+        {
+          "price": 5079.8,
+          "qty": 0.01082719,
+          "hit": false
+        }
+      ],
+      "high_water": 4676.0,
+      "low_water": null,
+      "timestamp": "2026-03-19T14:27:12.352936",
+      "entry_time": "2026-03-19T14:27:12.352978",
+      "entry_score": 129,
+      "mark_price": 4675.0
+    },
+    {
+      "symbol": "XPTUSDT",
+      "side": "Buy",
+      "size": 0.10222753805420104,
+      "margin": 10.0,
+      "leverage": 20,
+      "fee": 0.2,
+      "entry": 1956.42,
+      "pnl": 0.0,
+      "stop_price": 1945.0647999999999,
+      "original_stop": 1917.2916,
+      "take_profit": 2152.0620000000004,
+      "tp_stages": [
+        {
+          "price": 2054.241,
+          "qty": 0.05111377,
+          "hit": false
+        },
+        {
+          "price": 2103.1515,
+          "qty": 0.02555688,
+          "hit": false
+        },
+        {
+          "price": 2152.0620000000004,
+          "qty": 0.02555689,
+          "hit": false
+        }
+      ],
+      "high_water": 1984.76,
+      "low_water": null,
+      "timestamp": "2026-03-19T14:27:12.378327",
+      "entry_time": "2026-03-19T14:27:12.378366",
+      "entry_score": 131,
+      "mark_price": 1970.5
+    },
+    {
+      "symbol": "ATOMUSDT",
+      "side": "Buy",
+      "size": 273.22404371584696,
+      "margin": 10.0,
+      "leverage": 50,
+      "fee": 0.5,
+      "entry": 1.83,
+      "pnl": 0.0,
+      "stop_price": 1.81398,
+      "original_stop": 1.7934,
+      "take_profit": 2.0130000000000003,
+      "tp_stages": [
+        {
+          "price": 1.9215000000000002,
+          "qty": 136.61202186,
+          "hit": false
+        },
+        {
+          "price": 1.96725,
+          "qty": 68.30601093,
+          "hit": false
+        },
+        {
+          "price": 2.0130000000000003,
+          "qty": 68.30601093,
+          "hit": false
+        }
+      ],
+      "high_water": 1.851,
+      "low_water": null,
+      "timestamp": "2026-03-19T14:27:12.864272",
+      "entry_time": "2026-03-19T14:27:12.864311",
+      "entry_score": 169,
+      "mark_price": 1.839
+    },
+    {
+      "symbol": "WLDUSDT",
+      "side": "Buy",
+      "size": 611.0601894286588,
+      "margin": 10.0,
+      "leverage": 20,
+      "fee": 0.2,
+      "entry": 0.3273,
+      "pnl": 0.0,
+      "stop_price": 0.32928,
+      "original_stop": 0.320754,
+      "take_profit": 0.36003,
+      "tp_stages": [
+        {
+          "price": 0.343665,
+          "qty": 305.53009471,
+          "hit": false
+        },
+        {
+          "price": 0.3518475,
+          "qty": 152.76504736,
+          "hit": false
+        },
+        {
+          "price": 0.36003,
+          "qty": 152.76504736,
+          "hit": false
+        }
+      ],
+      "high_water": 0.336,
+      "low_water": null,
+      "timestamp": "2026-03-19T14:32:03.952523",
+      "entry_time": "2026-03-19T14:32:03.952540",
+      "entry_score": 129,
+      "mark_price": 0.3343
+    },
+    {
+      "symbol": "SAHARAUSDT",
+      "side": "Sell",
+      "size": 11123.470522803114,
+      "margin": 10.0,
+      "leverage": 30,
+      "fee": 0.3,
+      "entry": 0.02697,
+      "pnl": 0.0,
+      "stop_price": 0.0270606,
+      "original_stop": 0.0275094,
+      "take_profit": 0.024273000000000003,
+      "tp_stages": [
+        {
+          "price": 0.0256215,
+          "qty": 5561.7352614,
+          "hit": false
+        },
+        {
+          "price": 0.02494725,
+          "qty": 2780.8676307,
+          "hit": false
+        },
+        {
+          "price": 0.024273000000000003,
+          "qty": 2780.8676307,
+          "hit": false
+        }
+      ],
+      "high_water": null,
+      "low_water": 0.02653,
+      "timestamp": "2026-03-19T14:36:33.586543",
+      "entry_time": "2026-03-19T14:36:33.586582",
+      "entry_score": 144,
+      "mark_price": 0.02685
+    },
+    {
+      "symbol": "GER40USDT",
+      "side": "Buy",
+      "size": 0.007598807291207573,
+      "margin": 10.0,
+      "leverage": 20,
+      "fee": 0.2,
+      "entry": 26319.92,
+      "pnl": 0.0,
+      "stop_price": 26299.4172,
+      "original_stop": 25793.521599999996,
+      "take_profit": 28951.912,
+      "tp_stages": [
+        {
+          "price": 27635.916,
+          "qty": 0.0037994,
+          "hit": false
+        },
+        {
+          "price": 28293.913999999997,
+          "qty": 0.0018997,
+          "hit": false
+        },
+        {
+          "price": 28951.912,
+          "qty": 0.00189971,
+          "hit": false
+        }
+      ],
+      "high_water": 26836.14,
+      "low_water": null,
+      "timestamp": "2026-03-19T14:59:41.395917",
+      "entry_time": "2026-03-19T14:59:41.395976",
+      "entry_score": 129,
+      "mark_price": 26696.02
+    },
+    {
+      "symbol": "PENGUUSDT",
+      "side": "Buy",
+      "size": 28101.728256287763,
+      "margin": 10.0,
+      "leverage": 20,
+      "fee": 0.2,
+      "entry": 0.007117,
+      "pnl": 0.0,
+      "stop_price": 0.00700504,
+      "original_stop": 0.00697466,
+      "take_profit": 0.007828700000000001,
+      "tp_stages": [
+        {
+          "price": 0.0074728500000000005,
+          "qty": 14050.86412814,
+          "hit": false
+        },
+        {
+          "price": 0.007650774999999999,
+          "qty": 7025.43206407,
+          "hit": false
+        },
+        {
+          "price": 0.007828700000000001,
+          "qty": 7025.43206408,
+          "hit": false
+        }
+      ],
+      "high_water": 0.007148,
+      "low_water": null,
+      "timestamp": "2026-03-19T17:13:45.356876",
+      "entry_time": "2026-03-19T17:13:45.356940",
+      "entry_score": 130,
+      "mark_price": 0.007124
+    },
+    {
+      "symbol": "AAVEUSDT",
+      "side": "Buy",
+      "size": 1.7814197915738845,
+      "margin": 10.0,
+      "leverage": 20,
+      "fee": 0.2,
+      "entry": 112.27,
+      "pnl": 0.0,
+      "stop_price": 110.1128,
+      "original_stop": 110.02459999999999,
+      "take_profit": 123.497,
+      "tp_stages": [
+        {
+          "price": 117.8835,
+          "qty": 0.8907099,
+          "hit": false
+        },
+        {
+          "price": 120.69024999999999,
+          "qty": 0.44535495,
+          "hit": false
+        },
+        {
+          "price": 123.497,
+          "qty": 0.44535494,
+          "hit": false
+        }
+      ],
+      "high_water": 112.36,
+      "low_water": null,
+      "timestamp": "2026-03-19T17:13:45.692489",
+      "entry_time": "2026-03-19T17:13:45.692531",
+      "entry_score": 133,
+      "mark_price": 112.08
+    }
+  ]
+}

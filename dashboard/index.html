@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <!--
+      Telegram Mini App requirements:
+      • viewport must be set exactly like this — no user-scalable
+      • width=device-width is required; initial-scale=1.0 keeps 1:1 pixel ratio
+    -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+
+    <!--
+      IMPORTANT: The Telegram WebApp SDK *must* be the first script loaded,
+      before any of your own JS. It sets window.Telegram.WebApp synchronously.
+    -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <title>FancyBot Dashboard</title>
+
+    <!--
+      Remove default body/html margin and overflow so our scroll root
+      can own the full viewport cleanly.
+    -->
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        overflow: hidden;        /* The .sdb-root div owns scrolling */
+        background: #04070f;     /* Match --bg so there's no flash on load */
+        /* Telegram injects safe-area CSS env vars — expose them as custom props
+           so our JS (useTelegram.js) can read them too */
+        --tg-safe-area-inset-top:    env(safe-area-inset-top, 0px);
+        --tg-safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+        --tg-safe-area-inset-left:   env(safe-area-inset-left,  0px);
+        --tg-safe-area-inset-right:  env(safe-area-inset-right, 0px);
+      }
+      #root {
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <!-- Vite entry point -->
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

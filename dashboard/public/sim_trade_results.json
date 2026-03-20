@@ -1,0 +1,4 @@
+{"symbol": "BEATUSDT", "direction": "SHORT", "entry": 0.5847, "exit": 0.59568, "pnl": -3.7558, "hold_time_s": 1892, "score": 134, "reason": "stop", "timestamp": "2026-03-19T14:59:09.839484"}
+{"symbol": "SIGNUSDT", "direction": "SHORT", "entry": 0.04473, "exit": 0.0451248, "pnl": -0.8826, "hold_time_s": 5085, "score": 124, "reason": "stop", "timestamp": "2026-03-19T15:56:49.244154"}
+{"symbol": "BEATUSDT", "direction": "SHORT", "entry": 0.6, "exit": 0.608838, "pnl": -2.946, "hold_time_s": 2912, "score": 134, "reason": "stop", "timestamp": "2026-03-19T16:45:57.209665"}
+{"symbol": "DEXEUSDT", "direction": "SHORT", "entry": 6.191, "exit": 6.05676, "pnl": 10.8415, "hold_time_s": 9955, "score": 158, "reason": "stop", "timestamp": "2026-03-19T17:13:07.688781"}
