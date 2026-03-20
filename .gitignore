@@ -1,0 +1,32 @@
+# secrets
+.env
+*.env
+
+# bot runtime files
+bots/bot_trades.json
+bots/bot_blacklist.json
+bots/.bot_paused
+bots/.bot_state.json
+bots/.sim_session_counter
+bots/paper_account.json
+bots/*.bak
+
+# logs
+*.log
+logs/
+
+# python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+
+# ide
+.vscode/
+.idea/
+*.swp

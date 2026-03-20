@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>FangBlenny BOT</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  :root {
+    --bg:       #0d0f14;
+    --surface:  #141720;
+    --surface2: #1c2030;
+    --border:   #252a3a;
+    --accent:   #4fffb0;
+    --accent2:  #7b61ff;
+    --red:      #ff4f6b;
+    --yellow:   #ffd166;
+    --text:     #e2e8f0;
+    --muted:    #64748b;
+    --green:    #4fffb0;
+    --font:     'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 13px;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Header ────────────────────────────── */
+  .header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .header-left { display: flex; align-items: center; gap: 10px; }
+  .logo { font-size: 18px; font-weight: 700; letter-spacing: -0.5px; }
+  .logo span { color: var(--accent); }
+  .status-pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 10px; border-radius: 20px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.5px;
+    border: 1px solid;
+  }
+  .status-pill .dot { width: 6px; height: 6px; border-radius: 50%; }
+  .pill-running  { color: var(--accent); border-color: var(--accent); background: rgba(79,255,176,0.08); }
+  .pill-running .dot { background: var(--accent); box-shadow: 0 0 6px var(--accent); animation: pulse 1.5s infinite; }
+  .pill-paused   { color: var(--yellow); border-color: var(--yellow); background: rgba(255,209,102,0.08); }
+  .pill-paused .dot { background: var(--yellow); }
+  .pill-stopped  { color: var(--muted); border-color: var(--muted); background: rgba(100,116,139,0.08); }
+  .pill-stopped .dot { background: var(--muted); }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  /* ── Tabs ──────────────────────────────── */
+  .tabs {
+    display: flex; overflow-x: auto;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 12px;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    padding: 10px 16px; cursor: pointer;
+    white-space: nowrap; font-size: 12px;
+    color: var(--muted); border-bottom: 2px solid transparent;
+    transition: all .2s; user-select: none;
+  }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* ── Panel ─────────────────────────────── */
+  .panel { display: none; padding: 14px; }
+  .panel.active { display: block; }
+
+  /* ── Cards ─────────────────────────────── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px;
+    margin-bottom: 12px;
+  }
+  .card-title {
+    font-size: 10px; text-transform: uppercase;
+    letter-spacing: 1px; color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  /* ── P&L row ───────────────────────────── */
+  .pnl-grid {
+    display: grid; grid-template-columns: repeat(3,1fr); gap: 10px;
+  }
+  .pnl-item { text-align: center; }
+  .pnl-label { font-size: 10px; color: var(--muted); margin-bottom: 4px; }
+  .pnl-value { font-size: 20px; font-weight: 700; }
+  .pos  { color: var(--green); }
+  .neg  { color: var(--red); }
+  .neu  { color: var(--text); }
+
+  /* ── Control buttons ───────────────────── */
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .btn {
+    flex: 1; min-width: 80px;
+    padding: 10px 6px; border-radius: 8px;
+    border: 1px solid; font-family: var(--font);
+    font-size: 12px; font-weight: 600;
+    cursor: pointer; transition: all .15s;
+    letter-spacing: 0.3px;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-start  { background: rgba(79,255,176,0.1); border-color: var(--accent); color: var(--accent); }
+  .btn-start:hover  { background: rgba(79,255,176,0.2); }
+  .btn-stop   { background: rgba(255,79,107,0.1); border-color: var(--red); color: var(--red); }
+  .btn-stop:hover   { background: rgba(255,79,107,0.2); }
+  .btn-pause  { background: rgba(255,209,102,0.1); border-color: var(--yellow); color: var(--yellow); }
+  .btn-pause:hover  { background: rgba(255,209,102,0.2); }
+  .btn-resume { background: rgba(123,97,255,0.1); border-color: var(--accent2); color: var(--accent2); }
+  .btn-resume:hover { background: rgba(123,97,255,0.2); }
+  .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  /* ── Positions ─────────────────────────── */
+  .position-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px; padding: 12px;
+    margin-bottom: 8px;
+  }
+  .pos-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .pos-symbol { font-weight: 700; font-size: 14px; }
+  .pos-dir { font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 700; }
+  .dir-long  { background: rgba(79,255,176,0.15); color: var(--accent); }
+  .dir-short { background: rgba(255,79,107,0.15); color: var(--red); }
+  .pos-row { display: flex; justify-content: space-between; margin-top: 4px; }
+  .pos-key  { color: var(--muted); font-size: 11px; }
+  .pos-val  { font-size: 11px; }
+
+  /* ── Table ─────────────────────────────── */
+  .tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  th { color: var(--muted); font-weight: 600; text-align: left;
+       padding: 6px 8px; border-bottom: 1px solid var(--border);
+       white-space: nowrap; font-size: 10px; letter-spacing: 0.5px; }
+  td { padding: 7px 8px; border-bottom: 1px solid rgba(37,42,58,0.5); }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+  .badge {
+    display: inline-block; padding: 2px 7px; border-radius: 4px;
+    font-size: 10px; font-weight: 600;
+  }
+  .badge-entered  { background: rgba(79,255,176,0.15); color: var(--accent); }
+  .badge-stopped  { background: rgba(255,79,107,0.15); color: var(--red); }
+  .badge-failed   { background: rgba(255,209,102,0.15); color: var(--yellow); }
+  .badge-closed   { background: rgba(100,116,139,0.15); color: var(--muted); }
+
+  /* ── Config editor ─────────────────────── */
+  .config-row {
+    display: flex; align-items: center;
+    padding: 10px 0; border-bottom: 1px solid var(--border);
+    gap: 10px;
+  }
+  .config-row:last-child { border-bottom: none; }
+  .config-key  { flex: 1; font-size: 12px; }
+  .config-desc { font-size: 10px; color: var(--muted); margin-top: 2px; }
+  .config-input {
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text); font-family: var(--font); font-size: 12px;
+    padding: 6px 10px; border-radius: 6px; width: 110px; text-align: right;
+  }
+  .config-input:focus { outline: none; border-color: var(--accent2); }
+  .save-btn {
+    padding: 4px 10px; font-size: 11px; border-radius: 5px;
+    background: rgba(123,97,255,0.15); border: 1px solid var(--accent2);
+    color: var(--accent2); cursor: pointer; font-family: var(--font);
+  }
+  .save-btn:hover { background: rgba(123,97,255,0.3); }
+
+  /* ── Toast ─────────────────────────────── */
+  #toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: var(--surface2); border: 1px solid var(--border);
+    padding: 10px 18px; border-radius: 8px; font-size: 12px;
+    z-index: 999; opacity: 0; transition: opacity .3s;
+    pointer-events: none; white-space: nowrap;
+  }
+  #toast.show { opacity: 1; }
+
+  /* ── Misc ──────────────────────────────── */
+  .empty { text-align: center; color: var(--muted); padding: 32px 0; font-size: 12px; }
+  .refresh-note { font-size: 10px; color: var(--muted); text-align: right; margin-top: 6px; }
+  .uptime-bar { font-size: 11px; color: var(--muted); margin-top: 6px; }
+  .stat-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 12px; }
+  .stat-label { color: var(--muted); }
+  .scan-num { font-size: 11px; color: var(--accent2); }
+  .halted-banner {
+    background: rgba(255,79,107,0.1); border: 1px solid var(--red);
+    border-radius: 8px; padding: 10px 14px;
+    color: var(--red); font-size: 12px; margin-bottom: 12px;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-left">
+    <div class="logo">Fang<span>Blenny</span></div>
+    <div id="statusPill" class="status-pill pill-stopped">
+      <div class="dot"></div>
+      <span id="statusText">STOPPED</span>
+    </div>
+  </div>
+  <div class="scan-num" id="scanNum">—</div>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('dashboard')">Dashboard</div>
+  <div class="tab" onclick="switchTab('positions')">Positions</div>
+  <div class="tab" onclick="switchTab('trades')">Trades</div>
+  <div class="tab" onclick="switchTab('signals')">Signals</div>
+  <div class="tab" onclick="switchTab('config')">Config</div>
+  <div class="tab" onclick="switchTab('blacklist')">Blacklist</div>
+</div>
+
+<!-- ── DASHBOARD ── -->
+<div id="panel-dashboard" class="panel active">
+
+  <div id="haltedBanner" class="halted-banner">
+    ⚠️ ACCOUNT TRAILING STOP TRIGGERED — trading halted
+  </div>
+
+  <!-- P&L summary -->
+  <div class="card">
+    <div class="card-title">Account Snapshot</div>
+    <div class="pnl-grid">
+      <div class="pnl-item">
+        <div class="pnl-label">Balance</div>
+        <div class="pnl-value neu" id="balance">—</div>
+      </div>
+      <div class="pnl-item">
+        <div class="pnl-label">Unrealised PnL</div>
+        <div class="pnl-value" id="upnl">—</div>
+      </div>
+      <div class="pnl-item">
+        <div class="pnl-label">Equity</div>
+        <div class="pnl-value neu" id="equity">—</div>
+      </div>
+    </div>
+    <div class="stat-row" style="margin-top:10px;">
+      <span class="stat-label">Open positions</span>
+      <span id="openPos">—</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Max allowed</span>
+      <span id="maxPos">—</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Uptime</span>
+      <span id="uptime">—</span>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div class="card">
+    <div class="card-title">Bot Controls</div>
+    <div class="btn-row">
+      <button class="btn btn-start"  onclick="botAction('start')"  id="btnStart">▶ START</button>
+      <button class="btn btn-stop"   onclick="botAction('stop')"   id="btnStop">■ STOP</button>
+      <button class="btn btn-pause"  onclick="botAction('pause')"  id="btnPause">⏸ PAUSE</button>
+      <button class="btn btn-resume" onclick="botAction('resume')" id="btnResume">⏵ RESUME</button>
+    </div>
+  </div>
+
+  <div class="refresh-note" id="lastRefresh">Last refresh: —</div>
+</div>
+
+<!-- ── POSITIONS ── -->
+<div id="panel-positions" class="panel">
+  <div id="positionList"><div class="empty">Loading positions…</div></div>
+</div>
+
+<!-- ── TRADES ── -->
+<div id="panel-trades" class="panel">
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Time</th><th>Symbol</th><th>Dir</th>
+          <th>Status</th><th>Price</th><th>PnL</th>
+        </tr>
+      </thead>
+      <tbody id="tradesBody"><tr><td colspan="6" class="empty">Loading…</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ── SIGNALS ── -->
+<div id="panel-signals" class="panel">
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Time</th><th>Symbol</th><th>Dir</th>
+          <th>Score</th><th>Executed</th><th>Skip</th>
+        </tr>
+      </thead>
+      <tbody id="signalsBody"><tr><td colspan="6" class="empty">Loading…</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ── CONFIG ── -->
+<div id="panel-config" class="panel">
+  <div class="card">
+    <div class="card-title">Bot Configuration</div>
+    <div id="configList"><div class="empty">Loading…</div></div>
+  </div>
+</div>
+
+<!-- ── BLACKLIST ── -->
+<div id="panel-blacklist" class="panel">
+  <div class="card">
+    <div class="card-title">Blacklisted Symbols</div>
+    <div id="blacklistContent"><div class="empty">Loading…</div></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+// ── Config ───────────────────────────────────────────────────────
+const API = '';  // same origin — Railway serves both
+let currentTab = 'dashboard';
+
+// ── Telegram WebApp init ─────────────────────────────────────────
+if (window.Telegram && window.Telegram.WebApp) {
+  const tg = window.Telegram.WebApp;
+  tg.expand();
+  tg.setHeaderColor('#141720');
+  tg.setBackgroundColor('#0d0f14');
+}
+
+// ── Tabs ─────────────────────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t => {
+    if (t.textContent.toLowerCase().includes(name.replace('blacklist','black'))) {
+      t.classList.add('active');
+    }
+  });
+  currentTab = name;
+  refreshTab(name);
+}
+
+// ── API helpers ──────────────────────────────────────────────────
+async function api(path, method = 'GET', body = null) {
+  const opts = { method, headers: { 'Content-Type': 'application/json' } };
+  if (body) opts.body = JSON.stringify(body);
+  const r = await fetch(API + path, opts);
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+
+function toast(msg, duration = 2500) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), duration);
+}
+
+function fmtPnl(v) {
+  if (v === null || v === undefined) return '—';
+  const n = parseFloat(v);
+  if (isNaN(n)) return '—';
+  return (n >= 0 ? '+' : '') + n.toFixed(4);
+}
+function colorClass(v) {
+  const n = parseFloat(v);
+  if (isNaN(n)) return 'neu';
+  return n > 0 ? 'pos' : n < 0 ? 'neg' : 'neu';
+}
+function fmtTime(ts) {
+  if (!ts) return '—';
+  const d = new Date(ts);
+  return d.toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit'}) +
+         ' ' + d.toLocaleDateString('en-GB', {day:'2-digit',month:'2-digit'});
+}
+function fmtUptime(secs) {
+  if (!secs) return '—';
+  const h = Math.floor(secs / 3600);
+  const m = Math.floor((secs % 3600) / 60);
+  const s = secs % 60;
+  return `${h}h ${m}m ${s}s`;
+}
+
+// ── Status refresh ───────────────────────────────────────────────
+async function refreshStatus() {
+  try {
+    const st = await api('/api/status');
+    // status pill
+    const pill = document.getElementById('statusPill');
+    const txt  = document.getElementById('statusText');
+    pill.className = 'status-pill';
+    if (st.running && st.paused) {
+      pill.classList.add('pill-paused'); txt.textContent = 'PAUSED';
+    } else if (st.running) {
+      pill.classList.add('pill-running'); txt.textContent = 'RUNNING';
+    } else {
+      pill.classList.add('pill-stopped'); txt.textContent = 'STOPPED';
+    }
+    // scan number
+    document.getElementById('scanNum').textContent =
+      st.scan_number ? '#' + st.scan_number : '';
+    // P&L
+    document.getElementById('balance').textContent =
+      st.balance_usdt !== undefined ? '$' + parseFloat(st.balance_usdt).toFixed(2) : '—';
+    const upnlEl = document.getElementById('upnl');
+    upnlEl.textContent = fmtPnl(st.unrealized_pnl);
+    upnlEl.className   = 'pnl-value ' + colorClass(st.unrealized_pnl);
+    document.getElementById('equity').textContent =
+      st.equity !== undefined ? '$' + parseFloat(st.equity).toFixed(2) : '—';
+    // stats
+    document.getElementById('openPos').textContent = st.open_positions ?? '—';
+    document.getElementById('maxPos').textContent  = st.max_positions  ?? '—';
+    document.getElementById('uptime').textContent  = fmtUptime(st.uptime_seconds);
+    // halted
+    document.getElementById('haltedBanner').style.display =
+      st.account_halted ? 'block' : 'none';
+    // buttons
+    const running = st.running && !st.paused;
+    const paused  = st.running && st.paused;
+    const stopped = !st.running;
+    document.getElementById('btnStart').disabled  = !stopped;
+    document.getElementById('btnStop').disabled   = stopped;
+    document.getElementById('btnPause').disabled  = !running;
+    document.getElementById('btnResume').disabled = !paused;
+    // last refresh
+    document.getElementById('lastRefresh').textContent =
+      'Last refresh: ' + new Date().toLocaleTimeString();
+  } catch(e) { console.error('status error', e); }
+}
+
+// ── Bot controls ─────────────────────────────────────────────────
+async function botAction(action) {
+  try {
+    const method = action === 'stop' || action === 'pause' || action === 'resume'
+      ? 'POST' : 'POST';
+    const r = await api('/api/bot/' + action, 'POST');
+    toast('✓ ' + (r.status || action));
+    setTimeout(refreshStatus, 800);
+  } catch(e) { toast('✗ ' + e.message); }
+}
+
+// ── Positions ────────────────────────────────────────────────────
+async function refreshPositions() {
+  try {
+    const positions = await api('/api/positions');
+    const el = document.getElementById('positionList');
+    if (!positions || positions.length === 0) {
+      el.innerHTML = '<div class="empty">No open positions</div>';
+      return;
+    }
+    el.innerHTML = positions.map(p => `
+      <div class="position-card">
+        <div class="pos-header">
+          <span class="pos-symbol">${p.symbol || p.inst_id || '?'}</span>
+          <span class="pos-dir dir-${(p.direction||'long').toLowerCase()}">
+            ${p.direction || (p.side === 'Buy' ? 'LONG' : 'SHORT')}
+          </span>
+        </div>
+        <div class="pos-row">
+          <span class="pos-key">Entry</span>
+          <span class="pos-val">${parseFloat(p.entry_price||0).toFixed(4)}</span>
+        </div>
+        <div class="pos-row">
+          <span class="pos-key">Mark</span>
+          <span class="pos-val">${parseFloat(p.mark_price||p.price||0).toFixed(4)}</span>
+        </div>
+        <div class="pos-row">
+          <span class="pos-key">Stop</span>
+          <span class="pos-val neg">${p.stop_price ? parseFloat(p.stop_price).toFixed(4) : '—'}</span>
+        </div>
+        <div class="pos-row">
+          <span class="pos-key">uPnL</span>
+          <span class="pos-val ${colorClass(p.unrealized_pnl||p.pnl)}">${fmtPnl(p.unrealized_pnl||p.pnl)}</span>
+        </div>
+        <div class="pos-row">
+          <span class="pos-key">Score</span>
+          <span class="pos-val">${p.score || '—'}</span>
+        </div>
+      </div>
+    `).join('');
+  } catch(e) { console.error('positions error', e); }
+}
+
+// ── Trades ───────────────────────────────────────────────────────
+async function refreshTrades() {
+  try {
+    const trades = await api('/api/trades?limit=100');
+    const tb = document.getElementById('tradesBody');
+    if (!trades || trades.length === 0) {
+      tb.innerHTML = '<tr><td colspan="6" class="empty">No trades yet</td></tr>';
+      return;
+    }
+    tb.innerHTML = trades.map(t => {
+      const status = t.status || '';
+      let badge = status;
+      let cls = 'badge-closed';
+      if (status === 'entered')            cls = 'badge-entered';
+      else if (status === 'stopped')       cls = 'badge-stopped';
+      else if (status === 'trail_stop_failed') cls = 'badge-failed';
+      const pnl = t.pnl != null ? `<span class="${colorClass(t.pnl)}">${fmtPnl(t.pnl)}</span>` : '—';
+      return `<tr>
+        <td>${fmtTime(t.timestamp)}</td>
+        <td>${t.symbol||'—'}</td>
+        <td>${t.direction||'—'}</td>
+        <td><span class="badge ${cls}">${badge}</span></td>
+        <td>${t.price ? parseFloat(t.price).toFixed(4) : '—'}</td>
+        <td>${pnl}</td>
+      </tr>`;
+    }).join('');
+  } catch(e) { console.error('trades error', e); }
+}
+
+// ── Signals ──────────────────────────────────────────────────────
+async function refreshSignals() {
+  try {
+    const signals = await api('/api/signals?limit=80');
+    const tb = document.getElementById('signalsBody');
+    if (!signals || signals.length === 0) {
+      tb.innerHTML = '<tr><td colspan="6" class="empty">No signals yet</td></tr>';
+      return;
+    }
+    tb.innerHTML = signals.map(s => `
+      <tr>
+        <td>${fmtTime(s.timestamp)}</td>
+        <td>${s.symbol||'—'}</td>
+        <td>${s.direction||'—'}</td>
+        <td>${s.raw_score||s.effective_score||'—'}</td>
+        <td>${s.executed ? '<span class="pos">✓</span>' : '<span class="muted">✗</span>'}</td>
+        <td style="color:var(--muted);font-size:10px">${s.skip_reason||''}</td>
+      </tr>
+    `).join('');
+  } catch(e) { console.error('signals error', e); }
+}
+
+// ── Config ───────────────────────────────────────────────────────
+async function refreshConfig() {
+  try {
+    const cfg = await api('/api/config');
+    const el = document.getElementById('configList');
+    const entries = Object.entries(cfg);
+    if (entries.length === 0) {
+      el.innerHTML = '<div class="empty">No config found</div>';
+      return;
+    }
+    el.innerHTML = entries.map(([key, row]) => {
+      const val = typeof row === 'object' ? row.value : row;
+      const desc = typeof row === 'object' ? (row.description || '') : '';
+      return `
+        <div class="config-row">
+          <div class="config-key">
+            <div>${key}</div>
+            <div class="config-desc">${desc}</div>
+          </div>
+          <input class="config-input" id="cfg-${key}" value="${val}"/>
+          <button class="save-btn" onclick="saveConfig('${key}')">Save</button>
+        </div>
+      `;
+    }).join('');
+  } catch(e) { console.error('config error', e); }
+}
+
+async function saveConfig(key) {
+  const el = document.getElementById('cfg-' + key);
+  if (!el) return;
+  try {
+    await api('/api/config', 'POST', { key, value: el.value });
+    toast('✓ Saved ' + key);
+  } catch(e) { toast('✗ ' + e.message); }
+}
+
+// ── Blacklist ────────────────────────────────────────────────────
+async function refreshBlacklist() {
+  try {
+    const bl = await api('/api/blacklist');
+    const el = document.getElementById('blacklistContent');
+    const entries = Object.entries(bl);
+    if (entries.length === 0) {
+      el.innerHTML = '<div class="empty">Blacklist is empty</div>';
+      return;
+    }
+    el.innerHTML = entries.map(([sym, data]) => `
+      <div class="config-row">
+        <div class="config-key">
+          <div>${sym}</div>
+          <div class="config-desc">${data.reason || ''} · ${fmtTime(data.timestamp)}</div>
+        </div>
+        <button class="save-btn" style="color:var(--red);border-color:var(--red)"
+                onclick="removeBlacklist('${sym}')">Remove</button>
+      </div>
+    `).join('');
+  } catch(e) { console.error('blacklist error', e); }
+}
+
+async function removeBlacklist(symbol) {
+  try {
+    await api('/api/blacklist/' + symbol, 'DELETE');
+    toast('✓ Removed ' + symbol);
+    refreshBlacklist();
+  } catch(e) { toast('✗ ' + e.message); }
+}
+
+// ── Tab refresh dispatcher ───────────────────────────────────────
+function refreshTab(name) {
+  switch(name) {
+    case 'dashboard': refreshStatus(); break;
+    case 'positions': refreshPositions(); break;
+    case 'trades':    refreshTrades(); break;
+    case 'signals':   refreshSignals(); break;
+    case 'config':    refreshConfig(); break;
+    case 'blacklist': refreshBlacklist(); break;
+  }
+}
+
+// ── Auto-refresh ─────────────────────────────────────────────────
+function autoRefresh() {
+  refreshTab(currentTab);
+}
+
+// Initial load
+refreshStatus();
+refreshTab('dashboard');
+
+// Poll every 10s
+setInterval(autoRefresh, 10000);
+// Always keep status fresh
+setInterval(refreshStatus, 8000);
+</script>
+</body>
+</html>

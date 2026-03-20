@@ -1,0 +1,16 @@
+# ── railway.toml ─────────────────────────────────────────────────
+[build]
+builder          = "DOCKERFILE"
+dockerfilePath   = "Dockerfile"
+
+[deploy]
+startCommand     = "python main.py"
+healthcheckPath  = "/health"
+healthcheckTimeout = 30
+restartPolicyType  = "ON_FAILURE"
+restartPolicyMaxRetries = 5
+
+[[deploy.environmentVariables]]
+# These are set in Railway's dashboard → Variables tab.
+# Listed here for documentation only — Railway ignores unknown fields.
+# See .env.example for full list.
